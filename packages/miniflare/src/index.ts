@@ -87,6 +87,7 @@ import {
 	NameSourceOptions,
 	reviveError,
 	ServiceDesignatorSchema,
+	stripUserServicePrefix,
 } from "./plugins/core";
 import { InspectorProxyController } from "./plugins/core/inspector-proxy";
 import { HyperdriveProxyController } from "./plugins/hyperdrive/hyperdrive-proxy";
@@ -105,6 +106,7 @@ import {
 	Socket,
 	SocketIdentifier,
 	SocketPorts,
+	supportedCompatibilityDate,
 	Worker_Binding,
 	Worker_Module,
 } from "./runtime";
@@ -1872,10 +1874,10 @@ export class Miniflare {
 						binding.service?.name &&
 						externalUserServiceNames.has(binding.service.name)
 					) {
-						const workerName = binding.service.name.replace("core:user:", "");
-						Object.assign(
-							binding.service,
-							proxyDesignator(workerName, binding.service.entrypoint)
+						const workerName = stripUserServicePrefix(binding.service.name);
+						binding.service = proxyDesignator(
+							workerName,
+							binding.service.entrypoint
 						);
 					}
 				}
@@ -1890,7 +1892,7 @@ export class Miniflare {
 				for (let i = 0; i < tails.length; i++) {
 					const tail = tails[i];
 					if (tail.name && externalUserServiceNames.has(tail.name)) {
-						const workerName = tail.name.replace("core:user:", "");
+						const workerName = stripUserServicePrefix(tail.name);
 						tails[i] = proxyDesignator(workerName, tail.entrypoint);
 					}
 				}
@@ -1925,7 +1927,7 @@ export class Miniflare {
 			services.set(SERVICE_DEV_REGISTRY_PROXY, {
 				name: SERVICE_DEV_REGISTRY_PROXY,
 				worker: {
-					compatibilityDate: "2025-03-17",
+					compatibilityDate: supportedCompatibilityDate,
 					compatibilityFlags: [
 						"nodejs_compat",
 						"service_binding_extra_handlers",
