@@ -1583,6 +1583,7 @@ export class Miniflare {
 		const externalServices = devRegistryEnabled
 			? getExternalServiceEntrypoints(allWorkerOpts)
 			: null;
+
 		const durableObjectClassNames = getDurableObjectClassNames(allWorkerOpts);
 		const wrappedBindingNames = getWrappedBindingNames(
 			allWorkerOpts,
@@ -1884,6 +1885,21 @@ export class Miniflare {
 							binding.service.entrypoint
 						);
 					}
+				}
+			}
+
+			// Rewrite proxy bindings
+			for (const binding of proxyBindings) {
+				if (
+					"service" in binding &&
+					binding.service?.name &&
+					externalUserServiceNames.has(binding.service.name)
+				) {
+					const workerName = stripUserServicePrefix(binding.service.name);
+					binding.service = proxyDesignator(
+						workerName,
+						binding.service.entrypoint
+					);
 				}
 			}
 
