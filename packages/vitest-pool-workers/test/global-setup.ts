@@ -28,7 +28,7 @@ export default async function ({ provide }: GlobalSetupContext) {
 		await stop();
 
 		console.log("Cleaning up temporary directory...");
-		removeDir(projectPath, { fireAndForget: true });
+		await removeDir(projectPath, { fireAndForget: true });
 	};
 }
 
