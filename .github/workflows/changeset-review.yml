@@ -40,8 +40,8 @@ jobs:
 
       - name: Review Changesets with Bonk
         id: bonk-review
-        # Run for Version Packages PRs (which delete changesets) or regular PRs with new changesets
-        if: github.event.pull_request.title == 'Version Packages' || steps.changed-changesets.outputs.added_files_count > 0
+        # Run for Version Packages PRs (which delete changesets) or regular PRs with new/modified changesets
+        if: github.event.pull_request.title == 'Version Packages' || steps.changed-changesets.outputs.added_files_count > 0 || steps.changed-changesets.outputs.modified_files_count > 0
         uses: ask-bonk/ask-bonk/github@main
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_AI_GATEWAY_ACCOUNT_ID }}
@@ -53,7 +53,7 @@ jobs:
             Review the changeset files in this PR.
 
             For "Version Packages" PRs, review: ${{ steps.changed-changesets.outputs.deleted_files }}
-            For regular PRs, review: ${{ steps.changed-changesets.outputs.added_files }}
+            For regular PRs, review: ${{ steps.changed-changesets.outputs.added_files }} ${{ steps.changed-changesets.outputs.modified_files }}
 
             Read `.changeset/README.md` for guidelines, then validate:
             1. **Version Type**: Accept the author's choice of patch/minor unless clearly incorrect
@@ -74,6 +74,6 @@ jobs:
             If the user has attached an image, use the Read tool to view it. If and only if it's a cute animal, include in your comment a short cuteness report in the style of WeRateDogs (e.g., "This is Barkley. He's wearing a tiny hat and doesn't know why. 13/10"). If it's not an animal, silently ignore the image. If there is more than one image, check each one to find an animal. If you do not find an animal, do not include any reference to a cuteness report.
 
       - name: Skip notice
-        if: github.event.pull_request.title != 'Version Packages' && steps.changed-changesets.outputs.added_files_count == 0
+        if: github.event.pull_request.title != 'Version Packages' && steps.changed-changesets.outputs.added_files_count == 0 && steps.changed-changesets.outputs.modified_files_count == 0
         run: |
-          echo "No new changesets to review (only minor edits to pre-existing changesets detected)"
+          echo "No new or modified changesets to review in this commit"
