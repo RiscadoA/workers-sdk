@@ -33,6 +33,8 @@ jobs:
             .changeset/*.md
           files_ignore: |
             .changeset/README.md
+          # Compare only the latest commit against the previous commit (not against main)
+          since_last_remote_commit: true
           # Recover deleted files so Bonk can read them (needed for Version Packages PRs)
           recover_deleted_files: ${{ github.event.pull_request.title == 'Version Packages' }}
 
